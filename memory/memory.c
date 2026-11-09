@@ -1,5 +1,60 @@
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
+
+bool MoveBuffer(void *destination, const void *source, size_t length)
+{
+    if ((destination == NULL || source == NULL) && length != 0U)
+    {
+        return false;
+    }
+
+    uint8_t *dst = (uint8_t *)destination;
+    const uint8_t *src = (const uint8_t *)source;
+
+    if (dst == src || length == 0U)
+    {
+        return true;
+    }
+
+    const uintptr_t dst_address = (uintptr_t)dst;
+    const uintptr_t src_address = (uintptr_t)src;
+
+    if (dst_address > src_address && (dst_address - src_address) < length)
+    {
+        for (size_t i = length; i > 0U; --i)
+        {
+            dst[i - 1U] = src[i - 1U];
+        }
+    }
+    else
+    {
+        for (size_t i = 0U; i < length; ++i)
+        {
+            dst[i] = src[i];
+        }
+    }
+
+    return true;
+}
+
+int main(void)
+{
+    uint8_t buffer[10] = {0U, 1U, 2U, 3U, 4U, 5U, 6U, 7U, 8U, 9U};
+
+    (void)MoveBuffer(&buffer[2], &buffer[0], 8U);
+
+    for (size_t i = 0U; i < sizeof(buffer); ++i)
+    {
+        printf("%u ", buffer[i]);
+    }
+    putchar('\n');
+
+    return 0;
+}
 
 
 
